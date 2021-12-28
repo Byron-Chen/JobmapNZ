@@ -1,6 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 def get_jobs_from_seek(job, location, pagenum):
     url = "https://www.seek.co.nz/{}-jobs-in-information-communication-technology/in-{}?page={}&sortmode=ListedDate".format(job, location, pagenum)
@@ -52,11 +53,10 @@ def find_link(job):
     website_link = "https://www.seek.co.nz{}".format(link.get("href"))
     return website_link
 
-def search_job_pages():
+def search_job_pages(job_name, job_location):
     page_number = 1
     job_pages_list = []
-    job_page = get_jobs_from_seek("software-developer", "christchurch-canterbury", page_number)
-    #print(job_page == True)
+    job_page = get_jobs_from_seek(job_name, job_location, page_number)
     while job_page:
         print("page " + str(page_number))
         jobs_list = job_page.find_all(attrs={"data-automation" : "normalJob"})
@@ -75,14 +75,14 @@ def search_job_pages():
             job_pages_list.append(job_dict)
 
         page_number += 1
-        job_page = get_jobs_from_seek("software-developer", "christchurch-canterbury", page_number)
+        job_page = get_jobs_from_seek(job_name, job_location, page_number)
     
-    jobs_list_dict = {"jobs":job_pages_list}
+    jobs_list_dict = {"jobs":job_pages_list, "date":datetime.today().strftime('%Y-%m-%d')}
 
     with open('data.json', 'w') as f:
         json.dump(jobs_list_dict, f)
 
-search_job_pages()
+search_job_pages("software-developer", "all-new-zealand")
 
     
 

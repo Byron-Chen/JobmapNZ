@@ -1,0 +1,35 @@
+html{
+	height:100%;
+	width:100%;
+}
+body {
+	font-size: 16px; 
+	font-weight: 300; 
+	color: #555; 
+	margin:0; 
+	padding:0;
+	width:100%;
+}
+
+
+
+div#map{
+	float: left;
+	width: 900px;
+	height:800px;
+}
+
+div#sidebar{
+	position: relative;
+	width: 30%;
+	float:left;
+
+}
+
+div#under{
+	clear:both;
+}
+
+.joblist{
+	font-size: 12px;
+}
