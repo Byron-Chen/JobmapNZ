@@ -1,6 +1,6 @@
 {
   "scripts":{
-    "build:css":"tailwind build -i ./src/style.css -o ./dist/style.css --watch "
+    "build:css":"tailwind build -i ./src/style.css -o ./dist/style.css --watch"
   },
   "devDependencies": {
     "tailwindcss": "^3.0.8"
