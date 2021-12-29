@@ -63,6 +63,7 @@ function initMap(){
 		center: {lat:-41,  lng:172},
 		disableDefaultUI: true,
         zoomControl: false,
+        gestureHandling: "none",
 	});
 
     infowindow = new google.maps.InfoWindow();
@@ -114,8 +115,7 @@ function place_markers(location_name, num){
 	});
 	//add info box when location is clicked
 	google.maps.event.addListener(marker, 'click', function(){
-        console.log("add")
-        changeinfobox(location_name[0].toUpperCase() + location_name.substring(1), marker)
+        //changeinfobox(location_name[0].toUpperCase() + location_name.substring(1), marker)
         update_sidebar(location_name)
         //list_jobs(location_name)
 	})
@@ -145,7 +145,6 @@ function changeinfobox(info, marker){
 function list_jobs(){
     document.getElementById("jobs_list").innerHTML = ""
     for (job in sidebarjobslist){
-        console.log(sidebarjobslist[job])
         var jobelement = document.createElement("div")
         jobelement.setAttribute("class", "joblist")
         jobelement.innerHTML = '<a target="_blank" href="'+ sidebarjobslist[job]["job_link"] + '">'+sidebarjobslist[job]["job_title"]+'</a>';
