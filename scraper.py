@@ -53,6 +53,14 @@ def find_link(job):
     website_link = "https://www.seek.co.nz{}".format(link.get("href"))
     return website_link
 
+def find_listing_date(job):
+    date = job.find(attrs={"data-automation" : "jobListingDate"})
+    if date:
+        return_date = date.text
+    else:
+        return_date = ""
+    return return_date
+
 def search_job_pages(job_name, job_location):
     page_number = 1
     job_pages_list = []
@@ -66,7 +74,8 @@ def search_job_pages(job_name, job_location):
                 "job_company" : find_company(job),
                 "job_location" : find_location(job),
                 "job_link" : find_link(job),
-                "job_description": []
+                "job_description": [],
+                "job_date": find_listing_date(job)
             }
             job_desc = find_description(job)
             job_dict["job_description"].append(job_desc[0])
@@ -77,7 +86,7 @@ def search_job_pages(job_name, job_location):
         page_number += 1
         job_page = get_jobs_from_seek(job_name, job_location, page_number)
     
-    jobs_list_dict = {"jobs":job_pages_list, "date":datetime.today().strftime('%Y-%m-%d')}
+    jobs_list_dict = {"jobs":job_pages_list, "date":datetime.today().strftime('%Y-%m-%d-%H')}
 
     with open('data.json', 'w') as f:
         json.dump(jobs_list_dict, f)

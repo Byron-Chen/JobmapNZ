@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html{
+/*html{
 	height:100%;
 	width:100%;
 }
@@ -17,11 +17,7 @@ body {
 
 
 
-div#map{
-	float: left;
-	width: 900px;
-	height:800px;
-}
+
 
 div#sidebar{
 	position: relative;
@@ -36,4 +32,8 @@ div#under{
 
 .joblist{
 	font-size: 12px;
+}*/
+
+div#map{
+	height:800px;
 }

@@ -22,6 +22,10 @@ var jobs_list;
 var last_updated;
 var heatcolors = ["#6BC17C", "#FCC47C", "#F86A6B"]
 var sidebarjobslist = []
+var oldpagenum;
+var displayboxopened = false;
+var displayboxid = null;
+var displayboxold;
 
 function init(){
     city_list = []
@@ -37,6 +41,7 @@ function init(){
             }
         }
     }
+    console.log(city_list)
     document.getElementById('updated').innerText = "Last updated at: " + last_updated
     display_city_data(city_list)
 }
@@ -105,6 +110,17 @@ function place_markers(location_name, num){
         labelOrigin: new google.maps.Point(17, 20),
     };
 
+    var vmarkerhover = {
+        path: "M10,20 C10,10 25,10 25,20 25,30 10,30 10,20",
+        fillColor: circlecolor,
+        fillOpacity: 1,
+        strokeWeight: 0,
+        rotation: 0,
+        scale: circlesize,
+        anchor: new google.maps.Point(15, 20),
+        labelOrigin: new google.maps.Point(17, 20),
+    };
+
 
     var position = new google.maps.LatLng(lat, lng)
 	var marker = new google.maps.Marker({
@@ -120,17 +136,42 @@ function place_markers(location_name, num){
         //list_jobs(location_name)
 	})
 
+    google.maps.event.addListener(marker, 'mouseover', function(){
+        marker.setIcon(vmarkerhover)
+	})
+    google.maps.event.addListener(marker, 'mouseout', function(){
+        marker.setIcon(vmarker)
+	})
+
+}
+
+function first_letter_upper(str){
+    return str[0].toUpperCase() + str.substring(1)
 }
 
 function update_sidebar(location_name){
-    document.getElementById('sidebar_city').innerText = location_name
+    document.getElementById('sidebar_city').innerText = first_letter_upper(location_name)
     sidebarjobslist = []
     for (job in jobs_list){
         if(location_name == jobs_list[job]["job_location"][0].toLowerCase()){
             sidebarjobslist.push(jobs_list[job])
         }
     }
-    list_jobs()
+    pagenum = Math.ceil(sidebarjobslist.length/20)
+    
+    //page number bottom
+    document.getElementById("pagenumber").innerHTML = "<p class='inline'>Page: </p>"
+    for(i=0;i<pagenum;i++){
+        numelement = document.createElement("a")
+        numelement.setAttribute("class", "mx-1 hover:underline")
+        numelement.setAttribute("id", "pagenum"+(i+1).toString())
+        numelement.setAttribute("href", 'javascript:list_jobs('+ (i+1) + ')')
+        numelement.innerHTML = (i+1).toString()
+        //numelement.innerHTML = '<a href="javascript:list_jobs('+ (i+1) + ')">'+ (i+1).toString()+'</a>';
+        document.getElementById("pagenumber").appendChild(numelement)
+    }
+    list_jobs(1)
+
 }
 
 function changeinfobox(info, marker){
@@ -142,12 +183,75 @@ function changeinfobox(info, marker){
 	//the_map.panTo({lat: parseFloat(location[2]), lng: parseFloat(location[3])});
 }
 
-function list_jobs(){
+function convert_date(date){
+    d = a.split(' ')[0].slice(-1);
+    t = a.split(b)[0];
+    //last_updated
+    if (d == "d"){
+        
+    }
+
+}
+
+function display_job_info(jobid){
+    console.log(joblistpage[jobid])
+    jobdisplay = document.getElementById("job" + jobid) 
+    //displayboxold = jobdisplay.innerHTML '<a href="' + joblistpage[jobid]["job_link"] + '">'+ 
+    console.log('<a href="' + joblistpage[jobid]["job_link"] + '">')
+    jobdisplayfigurehtml =  '<figure id="displaybox" class="overflow-hidden bg-blue-200 rounded p-8 md:p-0">'
+    jobdisplayinfohtml = '<a class=" overflow-hidden" target="_blank" href="' + joblistpage[jobid]["job_link"] + '">'+ 
+    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_description"][0]+'</div>'  +
+    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_company"]+'</div>'  +
+    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_date"]+'</div></a>'
+    + '</figure>' //+ '</a>'
+
+    console.log(jobdisplayfigurehtml + jobdisplayinfohtml)
+    
+    console.log(displayboxid)
+    if(displayboxopened && displayboxid != jobid ){
+        document.getElementById("displaybox").remove()
+        document.getElementById('job' + displayboxid).innerHTML = displayboxold
+        displayboxold = jobdisplay.innerHTML
+       
+        
+        jobdisplay.innerHTML = jobdisplayfigurehtml + jobdisplay.innerHTML + jobdisplayinfohtml
+        displayboxopened = true
+        displayboxid = jobid
+    } else if (!displayboxopened){
+        displayboxold = jobdisplay.innerHTML
+        jobdisplay.innerHTML = jobdisplayfigurehtml + jobdisplay.innerHTML + jobdisplayinfohtml
+        displayboxopened = true
+        displayboxid = jobid
+    }else{
+        document.getElementById("displaybox").remove()
+        document.getElementById('job' + displayboxid).innerHTML = displayboxold
+        
+        
+        displayboxopened = false
+    }
+}
+
+function list_jobs(page_num){
+    displayboxopened = false;
+    displayboxid = null;
+
+    //page number 
+    joblistpage = sidebarjobslist.slice((page_num-1)*20, page_num*20)
+    if (oldpagenum){
+        document.getElementById("pagenum" + oldpagenum.toString()).setAttribute("class", "mx-1 hover:underline")
+    }
+    oldpagenum = page_num
+    document.getElementById("pagenum" + page_num.toString()).setAttribute("class", "mx-1 hover:underline underline") //FIZX THINGISHGNIDJ
+
+    //listing jobs
     document.getElementById("jobs_list").innerHTML = ""
-    for (job in sidebarjobslist){
-        var jobelement = document.createElement("div")
-        jobelement.setAttribute("class", "joblist")
-        jobelement.innerHTML = '<a target="_blank" href="'+ sidebarjobslist[job]["job_link"] + '">'+sidebarjobslist[job]["job_title"]+'</a>';
+    for (job in joblistpage ){
+        jobelement = document.createElement("div")
+        jobelement.setAttribute("id", "job" + job)
+        jobelement.setAttribute("class", "clear-both")
+        //jobelement.setAttribute("href", 'javascript:display_job_info('+ job + ')')
+        jobelement.innerHTML = '<a class="hover:underline float-left position-relative ml-3" href= ' + 'javascript:display_job_info('+ job + ')' + '>'+joblistpage[job]["job_title"]+'</a>';
+        //jobelement.innerHTML = '<p class="hover:underline" target="_blank" href="'+ joblistpage[job]["job_link"] + '">'+joblistpage[job]["job_title"]+'</p>';
         document.getElementById("jobs_list").appendChild(jobelement)
     }
 }
@@ -162,7 +266,6 @@ request.onload = function() {
     const jobs_json = request.response;
     jobs_list = jobs_json["jobs"]
     last_updated = jobs_json["date"]
-
 
 }
 
