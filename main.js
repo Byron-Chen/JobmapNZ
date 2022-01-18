@@ -41,7 +41,7 @@ function init(){
             }
         }
     }
-    console.log(city_list)
+    //console.log(city_list)
     document.getElementById('updated').innerText = "Last updated at: " + last_updated
     display_city_data(city_list)
 }
@@ -170,6 +170,7 @@ function update_sidebar(location_name){
         //numelement.innerHTML = '<a href="javascript:list_jobs('+ (i+1) + ')">'+ (i+1).toString()+'</a>';
         document.getElementById("pagenumber").appendChild(numelement)
     }
+    oldpagenum = null
     list_jobs(1)
 
 }
@@ -184,30 +185,52 @@ function changeinfobox(info, marker){
 }
 
 function convert_date(date){
-    d = a.split(' ')[0].slice(-1);
-    t = a.split(b)[0];
+    if (date == "30d+ ago"){
+        return date
+    }
+    d = date.split(' ')[0].slice(-1);
+    t = date.split(d)[0];
     //last_updated
-    if (d == "d"){
-        
+    dd = last_updated.split("-")
+    time_dist = new Date() - new Date(dd[0], dd[1]-1, dd[2], dd[3])
+    if (time_dist / (1000*3600) < 24 ){
+        if(d == "h"){
+            if (Math.ceil(time_dist / (1000*3600)) + parseInt(t) > 24){
+                return "1d ago"
+            }else{
+                //console.log(Math.ceil(time_dist / (1000*3600)), t)
+                return (Math.ceil(time_dist / (1000*3600)) + parseInt(t)).toString() + "h ago"
+            }
+        }else{
+            return date
+        }
+    }else{
+        //console.log(t, Math.ceil(time_dist / (1000*3600)))
+        //console.log(Math.ceil(time_dist / (1000*3600 * 24)) , parseInt(t))
+        if (d=="h"){
+            return (Math.ceil(time_dist / (1000*3600 * 24))) + "d ago"
+        }else {
+            return (Math.ceil(time_dist / (1000*3600 * 24)) + parseInt(t)) + "d ago"
+        }
     }
 
 }
 
 function display_job_info(jobid){
-    console.log(joblistpage[jobid])
+    //console.log(joblistpage[jobid])
     jobdisplay = document.getElementById("job" + jobid) 
     //displayboxold = jobdisplay.innerHTML '<a href="' + joblistpage[jobid]["job_link"] + '">'+ 
-    console.log('<a href="' + joblistpage[jobid]["job_link"] + '">')
+    //console.log('<a href="' + joblistpage[jobid]["job_link"] + '">')
     jobdisplayfigurehtml =  '<figure id="displaybox" class="overflow-hidden bg-blue-200 rounded p-8 md:p-0">'
     jobdisplayinfohtml = '<a class=" overflow-hidden" target="_blank" href="' + joblistpage[jobid]["job_link"] + '">'+ 
-    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_description"][0]+'</div>'  +
+    '<div class="text-black text-sm ml-3 mr-3 float-left clear-both">'+ joblistpage[jobid]["job_description"][0]+'</div>'  +
     '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_company"]+'</div>'  +
-    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ joblistpage[jobid]["job_date"]+'</div></a>'
+    '<div class="text-black text-sm ml-3 float-left clear-both w-full">'+ convert_date(joblistpage[jobid]["job_date"])+'</div></a>'
     + '</figure>' //+ '</a>'
 
-    console.log(jobdisplayfigurehtml + jobdisplayinfohtml)
+    //console.log(jobdisplayfigurehtml + jobdisplayinfohtml)
     
-    console.log(displayboxid)
+    //console.log(displayboxid)
     if(displayboxopened && displayboxid != jobid ){
         document.getElementById("displaybox").remove()
         document.getElementById('job' + displayboxid).innerHTML = displayboxold
