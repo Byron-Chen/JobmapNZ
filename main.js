@@ -12,7 +12,8 @@ locations = [
     ["tasman", "-41.50861597078496", "172.77188660327224"],
     ["northland", "-35.730603386218085", "174.2856496043747"],
     ["west coast", "-42.46026517738282", "171.20069891207208"],
-    ["marlborough", "-41.51570907481636", "173.9675152825159"]
+    ["marlborough", "-41.51570907481636", "173.9675152825159"],
+    ["gisborne", "-38.66281046852614", "178.01865279811545"]
 ]
 
 
@@ -26,6 +27,7 @@ var oldpagenum;
 var displayboxopened = false;
 var displayboxid = null;
 var displayboxold;
+
 
 function init(){
     city_list = []
@@ -41,7 +43,7 @@ function init(){
             }
         }
     }
-    //console.log(city_list)
+    console.log(city_list)
     document.getElementById('updated').innerText = "Last updated at: " + last_updated
     display_city_data(city_list)
 }
@@ -160,10 +162,10 @@ function update_sidebar(location_name){
     pagenum = Math.ceil(sidebarjobslist.length/20)
     
     //page number bottom
-    document.getElementById("pagenumber").innerHTML = "<p class='inline'>Page: </p>"
+    document.getElementById("pagenumber").innerHTML = "<p class='inline'></p>"
     for(i=0;i<pagenum;i++){
         numelement = document.createElement("a")
-        numelement.setAttribute("class", "mx-1 hover:underline")
+        numelement.setAttribute("class", "mx-1 hover:underline px-2 py-2")
         numelement.setAttribute("id", "pagenum"+(i+1).toString())
         numelement.setAttribute("href", 'javascript:list_jobs('+ (i+1) + ')')
         numelement.innerHTML = (i+1).toString()
@@ -190,6 +192,10 @@ function convert_date(date){
     }
     d = date.split(' ')[0].slice(-1);
     t = date.split(d)[0];
+    if (d=="m"){
+        d="h"
+        t="1"
+    }
     //last_updated
     dd = last_updated.split("-")
     time_dist = new Date() - new Date(dd[0], dd[1]-1, dd[2], dd[3])
@@ -199,7 +205,7 @@ function convert_date(date){
                 return "1d ago"
             }else{
                 //console.log(Math.ceil(time_dist / (1000*3600)), t)
-                return (Math.ceil(time_dist / (1000*3600)) + parseInt(t)).toString() + "h ago"
+                return ((Math.ceil(time_dist / (1000*3600)) + parseInt(t)).toString() -1 ) + "h ago"
             }
         }else{
             return date
@@ -261,17 +267,16 @@ function list_jobs(page_num){
     //page number 
     joblistpage = sidebarjobslist.slice((page_num-1)*20, page_num*20)
     if (oldpagenum){
-        document.getElementById("pagenum" + oldpagenum.toString()).setAttribute("class", "mx-1 hover:underline")
+        document.getElementById("pagenum" + oldpagenum.toString()).setAttribute("class", "mx-1 hover:underline px-2 py-2")
     }
     oldpagenum = page_num
-    document.getElementById("pagenum" + page_num.toString()).setAttribute("class", "mx-1 hover:underline underline") //FIZX THINGISHGNIDJ
-
+    document.getElementById("pagenum" + page_num.toString()).setAttribute("class", "mx-1 border border-sky-500 rounded-md px-2 py-2") //FIZX THINGISHGNIDJy
     //listing jobs
     document.getElementById("jobs_list").innerHTML = ""
     for (job in joblistpage ){
         jobelement = document.createElement("div")
         jobelement.setAttribute("id", "job" + job)
-        jobelement.setAttribute("class", "clear-both")
+        jobelement.setAttribute("class", "clear-both overflow-auto")
         //jobelement.setAttribute("href", 'javascript:display_job_info('+ job + ')')
         jobelement.innerHTML = '<a class="hover:underline float-left position-relative ml-3" href= ' + 'javascript:display_job_info('+ job + ')' + '>'+joblistpage[job]["job_title"]+'</a>';
         //jobelement.innerHTML = '<p class="hover:underline" target="_blank" href="'+ joblistpage[job]["job_link"] + '">'+joblistpage[job]["job_title"]+'</p>';
